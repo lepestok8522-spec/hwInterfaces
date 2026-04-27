@@ -20,7 +20,7 @@ public class AviaSouls {
         return tickets;
     }
 
-        private void sortTickets(Ticket[] array) {
+    private void sortTickets(Ticket[] array) {
         for (int i = 0; i < array.length - 1; i++) {
             for (int j = 0; j < array.length - i - 1; j++) {
                 if (array[j].compareTo(array[j + 1]) > 0) {
