@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.Comparator;
 
 public class AviaSouls {
@@ -20,31 +21,6 @@ public class AviaSouls {
         return tickets;
     }
 
-    private void sortTickets(Ticket[] array) {
-        for (int i = 0; i < array.length - 1; i++) {
-            for (int j = 0; j < array.length - i - 1; j++) {
-                if (array[j].compareTo(array[j + 1]) > 0) {
-                    Ticket temp = array[j];
-                    array[j] = array[j + 1];
-                    array[j + 1] = temp;
-                }
-            }
-        }
-    }
-
-    // Метод для сортировки с компаратором
-    private void sortTickets(Ticket[] array, Comparator<Ticket> comparator) {
-        for (int i = 0; i < array.length - 1; i++) {
-            for (int j = 0; j < array.length - i - 1; j++) {
-                if (comparator.compare(array[j], array[j + 1]) > 0) {
-                    Ticket temp = array[j];
-                    array[j] = array[j + 1];
-                    array[j + 1] = temp;
-                }
-            }
-        }
-    }
-
     public Ticket[] search(String from, String to) {
         Ticket[] result = new Ticket[0];
         for (Ticket ticket : tickets) {
@@ -54,7 +30,7 @@ public class AviaSouls {
                 }
             }
         }
-        sortTickets(result);
+        Arrays.sort(result);
         return result;
     }
 
@@ -67,7 +43,7 @@ public class AviaSouls {
                 }
             }
         }
-        sortTickets(result, comparator);
+        Arrays.sort(result, comparator);
         return result;
     }
 }

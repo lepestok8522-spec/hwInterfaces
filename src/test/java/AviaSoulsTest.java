@@ -1,13 +1,29 @@
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class AviaSoulsTest {
 
     @Test
-    void testSearchSortByPrice() {
+    public void testCompareToByPrice() {
+        Ticket ticket1 = new Ticket("DME", "LED", 5000, 1000, 1200);
+        Ticket ticket2 = new Ticket("DME", "LED", 4500, 1400, 1530);
+        Ticket ticket3 = new Ticket("DME", "LED", 6000, 900, 1130);
+
+
+        assertTrue(ticket2.compareTo(ticket1) < 0);  // ticket2 дешевле
+        assertTrue(ticket1.compareTo(ticket3) < 0);  // ticket1 дешевле
+        assertTrue(ticket3.compareTo(ticket1) > 0);  // ticket3 дороже
+
+
+        Ticket ticket6 = new Ticket("DME", "LED", 5000, 1000, 1200);
+        assertEquals(0, ticket1.compareTo(ticket6));
+    }
+
+    @Test
+    public void testSearchSortByPrice() {
         AviaSouls manager = new AviaSouls();
 
-        // Создаем билеты с разными ценами
         Ticket ticket1 = new Ticket("DME", "LED", 5000, 1000, 1200);
         Ticket ticket2 = new Ticket("DME", "LED", 4500, 1400, 1530);
         Ticket ticket3 = new Ticket("DME", "LED", 6000, 900, 1130);
@@ -22,18 +38,17 @@ class AviaSoulsTest {
 
         Ticket[] result = manager.search("DME", "LED");
 
-        // Должно быть 4 билета на маршрут DME-LED
         assertEquals(4, result.length);
 
-        // Проверяем сортировку по цене (от меньшей к большей)
-        assertEquals(4500, result[0].getPrice()); // самый дешевый
+
+        assertEquals(4500, result[0].getPrice());
         assertEquals(5000, result[1].getPrice());
         assertEquals(5500, result[2].getPrice());
-        assertEquals(6000, result[3].getPrice()); // самый дорогой
+        assertEquals(6000, result[3].getPrice());
     }
 
     @Test
-    void testSearchNoResults() {
+    public void testSearchNoResults() {
         AviaSouls manager = new AviaSouls();
 
         Ticket ticket1 = new Ticket("DME", "LED", 5000, 1000, 1200);
@@ -42,47 +57,38 @@ class AviaSoulsTest {
         manager.add(ticket1);
         manager.add(ticket2);
 
-        // Поиск по несуществующему маршруту
         Ticket[] result = manager.search("DME", "GOJ");
         assertEquals(0, result.length);
 
-        // Поиск по существующему маршруту с 1 билетом
         Ticket[] result2 = manager.search("SVO", "KZN");
         assertEquals(1, result2.length);
         assertEquals(3000, result2[0].getPrice());
     }
 
     @Test
-    void testTicketTimeComparator() {
+    public void testTicketTimeComparator() {
         TicketTimeComparator comparator = new TicketTimeComparator();
 
-        // Создаем билеты с разным временем полета
         Ticket ticket1 = new Ticket("DME", "LED", 5000, 1000, 1200);  // полет 2 часа
         Ticket ticket2 = new Ticket("DME", "LED", 4500, 1400, 1530);  // полет 1.5 часа
         Ticket ticket3 = new Ticket("DME", "LED", 6000, 900, 1130);    // полет 2.5 часа
         Ticket ticket5 = new Ticket("DME", "LED", 5500, 1600, 1800);   // полет 2 часа
 
-        // Проверяем сравнение по времени полета
-        // ticket2: 1.5 часа, ticket1: 2 часа
+
         assertTrue(comparator.compare(ticket2, ticket1) < 0);
-
-        // ticket1: 2 часа, ticket3: 2.5 часа
         assertTrue(comparator.compare(ticket1, ticket3) < 0);
-
-        // ticket1 и ticket5: оба по 2 часа
         assertEquals(0, comparator.compare(ticket1, ticket5));
     }
 
     @Test
-    void testSearchAndSortByTime() {
+    public void testSearchAndSortByTime() {
         AviaSouls manager = new AviaSouls();
 
-
-        Ticket ticket1 = new Ticket("DME", "LED", 5000, 1000, 1200);  // полет 2 часа
-        Ticket ticket2 = new Ticket("DME", "LED", 4500, 1400, 1530);  // полет 1.5 часа
-        Ticket ticket3 = new Ticket("DME", "LED", 6000, 900, 1130);    // полет 2.5 часа
-        Ticket ticket4 = new Ticket("SVO", "KZN", 3000, 800, 1000);    // другой маршрут
-        Ticket ticket5 = new Ticket("DME", "LED", 5500, 1600, 1800);   // полет 2 часа
+        Ticket ticket1 = new Ticket("DME", "LED", 5000, 1000, 1200);  // 2 часа
+        Ticket ticket2 = new Ticket("DME", "LED", 4500, 1400, 1530);  // 1.5 часа
+        Ticket ticket3 = new Ticket("DME", "LED", 6000, 900, 1130);    // 2.5 часа
+        Ticket ticket4 = new Ticket("SVO", "KZN", 3000, 800, 1000);
+        Ticket ticket5 = new Ticket("DME", "LED", 5500, 1600, 1800);   // 2 часа
 
         manager.add(ticket1);
         manager.add(ticket2);
@@ -95,26 +101,28 @@ class AviaSoulsTest {
 
         assertEquals(4, result.length);
 
+
         assertEquals(ticket2, result[0]);
 
 
-        boolean foundFirstTwoHour = false;
-        boolean foundSecondTwoHour = false;
+        boolean hasTicket1 = false;
+        boolean hasTicket5 = false;
 
-        if (result[1] == ticket1 || result[1] == ticket5) {
-            foundFirstTwoHour = true;
+
+        if (result[1].getPrice() == 5000 && result[2].getPrice() == 5500) {
+            hasTicket1 = true;
+            hasTicket5 = true;
+        } else if (result[1].getPrice() == 5500 && result[2].getPrice() == 5000) {
+            hasTicket1 = true;
+            hasTicket5 = true;
         }
-        if (result[2] == ticket1 || result[2] == ticket5) {
-            foundSecondTwoHour = true;
-        }
 
-        assertTrue(foundFirstTwoHour && foundSecondTwoHour);
-
-        assertEquals(ticket3, result[3]); // самый долгий полет
+        assertTrue(hasTicket1 && hasTicket5);
+        assertEquals(ticket3, result[3]);
     }
 
     @Test
-    void testSearchAndSortByTimeNoResults() {
+    public void testSearchAndSortByTimeNoResults() {
         AviaSouls manager = new AviaSouls();
 
         Ticket ticket1 = new Ticket("DME", "LED", 5000, 1000, 1200);
@@ -126,7 +134,7 @@ class AviaSoulsTest {
     }
 
     @Test
-    void testFindAll() {
+    public void testFindAll() {
         AviaSouls manager = new AviaSouls();
 
         Ticket ticket1 = new Ticket("DME", "LED", 5000, 1000, 1200);
@@ -140,7 +148,7 @@ class AviaSoulsTest {
     }
 
     @Test
-    void testAddMultipleTickets() {
+    public void testAddMultipleTickets() {
         AviaSouls newManager = new AviaSouls();
         assertEquals(0, newManager.findAll().length);
 
@@ -155,25 +163,24 @@ class AviaSoulsTest {
     }
 
     @Test
-    void testSameFlightTimeDifferentPrices() {
+    public void testSortingWithEqualPrices() {
         AviaSouls manager = new AviaSouls();
 
 
-        Ticket ticket1 = new Ticket("DME", "LED", 5000, 1000, 1200);  // 2 часа
-        Ticket ticket2 = new Ticket("DME", "LED", 4500, 1000, 1200);  // 2 часа
-        Ticket ticket3 = new Ticket("DME", "LED", 6000, 1000, 1200);  // 2 часа
+        Ticket ticket1 = new Ticket("DME", "LED", 5000, 1000, 1200);
+        Ticket ticket2 = new Ticket("DME", "LED", 5000, 1400, 1530);
+        Ticket ticket3 = new Ticket("DME", "LED", 5000, 900, 1130);
 
         manager.add(ticket1);
         manager.add(ticket2);
         manager.add(ticket3);
 
-
-        TicketTimeComparator comparator = new TicketTimeComparator();
-        Ticket[] result = manager.searchAndSortBy("DME", "LED", comparator);
+        Ticket[] result = manager.search("DME", "LED");
 
         assertEquals(3, result.length);
 
-        assertEquals(0, comparator.compare(result[0], result[1]));
-        assertEquals(0, comparator.compare(result[1], result[2]));
+        assertEquals(5000, result[0].getPrice());
+        assertEquals(5000, result[1].getPrice());
+        assertEquals(5000, result[2].getPrice());
     }
 }
